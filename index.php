@@ -16,24 +16,10 @@
 </head>
 
 <body>
-  <nav class="navbar navbar-expand-lg navbar-dark">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="/sistema-academico/">Navbar</a>
-      <div class="container-fluid d-flex justify-content-center">
-        <ul class="navbar-nav">
-          <li class="nav-item">
-            <a class="nav-link" href="./pages/disciplinas.html">Disciplinas</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="./pages/professores.html">Professores</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="./pages/alunos.html">Alunos</a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
+  <?php
+    include "./components/navbar.html";
+  ?>
+
   <h1 class="display-6 my-5 text-center">Bem-vindo a plataforma de Estudo!</h1>
   <div class="col mx-auto text-center">
     <img src="./assets/images/landing.svg" alt="" />
