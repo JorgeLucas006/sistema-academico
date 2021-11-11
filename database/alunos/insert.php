@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-$pdo = require('./connect.php');
+$pdo = require('../connect.php');
 $sql = 'insert into disciplinas (nome) values (?)';
 
 $prepare = $pdo->prepare($sql);

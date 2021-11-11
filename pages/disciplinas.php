@@ -1,34 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
-    crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="../assets/styles/style.css">
-
-  <title>Document</title>
-</head>
+<?php
+  include "../components/head.html";
+?>
 
 <body>
   
   <?php
     include "../components/navbar.html";
+    $pdo = require($_SERVER['DOCUMENT_ROOT'].'/sistema-academico/database/connect.php');
+    $dados = filter_input_array(INPUT_POST, FILTER_DEFAULT);
+    if(!empty($dados['enviar'])){
+      $query_disciplina = "INSERT INTO disciplinas (codigo, nome, professor_disciplina) VALUES ('".$dados['cod']."', '".$dados['name']."', ".$dados['teacher'].")";
+      
+      $cadDisc = $pdo->prepare($query_disciplina);
+      $cadDisc->execute();
+      header('Location: ./disciplinas.php');
+    }
   ?>
   
-  <div class="container my-5">
+  <div class="container-fluid text-center my-5">
+    <button type="button" class="btn btn-primary " data-toggle="modal" data-target="#adicionar" data-whatever="@getbootstrap">Adicionar</button>
+    
+    <div class="modal fade" id="adicionar" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Adicionar disciplina</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form name="adiciona-disciplina" method="POST" action="">
+              <div class="form-group">
+                <label for="recipient-name" class="col-form-label">Código:</label>
+                <input type="text" class="form-control" name="cod" id="cod" required>
+              </div>
+              <div class="form-group">
+                <label for="message-text" class="col-form-label">Nome:</label>
+                <input type="text" class="form-control" name="name" id="name" required>
+              </div>
+              <div class="form-group">
+                <label for="message-text" class="col-form-label">Professor:</label>
+                <select class="custom-select" name="teacher" id="teacher" required>
+                  <option selected disabled value="">Escolha</option>
+                  <?php
+                    $pdo = require($_SERVER['DOCUMENT_ROOT'].'/sistema-academico/database/connect.php');
+                    $sql = 'SELECT id, nome FROM professores';
+
+                    foreach($pdo->query($sql) as $key => $value){
+                      echo '<option value='.$value['id'].'>'.$value['nome'].'</option>';
+                    }
+                  ?>
+                </select>
+              </div>
+              <input type="submit" class="btn btn-primary" name="enviar"></input>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div> 
+  </div>
+  
+    
+  <div class="container ">
     <div class="row">
       <?php
       
-      $list = require('../database/list.php');
-      $nome;
-      $codigo;
-      $p_nome;
+      $list = require('../database/disciplinas/list.php');
 
       foreach($list as $key => $value){
         echo 
@@ -52,6 +96,7 @@
       ?>
     </div>
   </div>
+  
 </body>
 
 </html>
