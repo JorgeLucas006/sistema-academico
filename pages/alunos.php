@@ -9,24 +9,10 @@ include "../components/head.html";
 
   <?php
   include "../components/navbar.html";
-  $dados = filter_input_array(INPUT_POST, FILTER_DEFAULT);
-  if (!empty($dados['enviar'])) {
-    $query_alunos = "INSERT INTO alunos (codigo, nome, cpf, dt_nascimento) VALUES ('" . $dados['cod'] . "', '" . $dados['name'] . "', " . $dados['cpf'] . ", '" . $dados['date'] . "')";
-
-    $query_aluno_disciplina = "INSERT INTO alunos (codigo, nome, cpf, dt_nascimento) VALUES ('" . $dados['cod'] . "', '" . $dados['name'] . "', " . $dados['cpf'] . ", '" . $dados['date'] . "')";
-
-    foreach ($dados['disc'] as $value) {
-      echo $value . "<br><br>";
-    }
-    /*$cadProf = $pdo->prepare($query_professor);
-    $cadProf->execute();
-    header('Location: ./professores.php');*/
-  }
   ?>
 
   <div class="container-fluid text-center my-5">
     <button type="button" class="btn btn-primary " data-toggle="modal" data-target="#adicionar" data-whatever="@getbootstrap">Adicionar</button>
-
     <div class="modal fade" id="adicionar" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -66,9 +52,9 @@ include "../components/head.html";
                   echo
                   '
                   <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="disc[]" value="'.$value['id'].'" id="id_disc">
-                    <label class="form-check-label" for="id_disc">
-                      '.$value['nome'].'
+                    <input class="form-check-input" type="checkbox" name="chklist" value="' . $value['nome'] . '" id="' . $value['id'] . '">
+                    <label class="form-check-label" for="' . $value['id'] . '">
+                      ' . $value['nome'] . '
                     </label>
                   </div>
                   ';
@@ -77,7 +63,7 @@ include "../components/head.html";
                 ?>
 
               </div>
-              <input type="submit" class="btn btn-primary" name="enviar"></input>
+              <input type="button" class="btn btn-primary" value="Enviar" onclick="addAluno()"></input>
             </form>
           </div>
         </div>
@@ -90,10 +76,8 @@ include "../components/head.html";
       <?php
 
       $list = require('../database/alunos/list.php');
-
       foreach ($list as $key => $value) {
         echo
-
         '
         <div class="col-sm-4 mb-5">
           <div class="card">
@@ -103,7 +87,6 @@ include "../components/head.html";
               <p class="card-text">' . $value['codigo'] . '</p>
               <a href="#" class="btn btn-primary">Alterar</a>
               <a href="#" class="btn btn-danger">Excluir</a>
-            
             </div>
           </div>
         </div>';
@@ -111,6 +94,111 @@ include "../components/head.html";
       ?>
     </div>
   </div>
+
+  <script>
+    function alterModal(cod, nome, cpf, date, id) {
+      var modal = $('#update-modal');
+      modal.find('#update-cod').val(cod);
+      modal.find('#update-name').val(nome);
+      modal.find('#update-cpf').val(cpf);
+      modal.find('#update-date').val(date);
+      modal.find('#id-selector').val(id);
+    }
+
+    function deleteProf(id, nome) {
+      $.ajax({
+        url: '../database/professores/delete.php',
+        type: 'POST',
+        data: {
+          id: id
+        },
+        success: function(result) {
+          // Retorno se tudo ocorreu normalmente
+          alert("Professor " + nome + " excluido(a) com sucesso");
+          location.reload(); // then reload the page.(3)
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+          // Retorno caso algum erro ocorra
+        }
+      })
+    }
+
+    function addAluno() {
+      var cod = $('#cod').val();
+      var nome = $('#name').val();
+      var cpf = $('#cpf').val();
+      var date = $('#date').val();
+
+      // Validação para adicionar uma disciplina
+      if (cod && nome && cpf && date) {
+        // Caso todos os campos sejam preenchidos
+        $('input[name="chklist"]:checked').toArray().map((check) => {
+          $.ajax({
+            url: '../database/alunos/insert.php',
+            type: 'POST',
+            data: {
+              cod: cod,
+              nome: nome,
+              cpf: cpf,
+              date: date,
+              disciplina: $(check).val(),
+            },
+            success: function(result) {
+              // Retorno se tudo ocorreu normalmente
+              console.log(result);
+              /*
+              alert("Aluno " + nome + " adicionado(a) com sucesso");
+              location.reload();*/
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+              // Retorno caso algum erro ocorra
+              alert("Erro: " + textStatus);
+            }
+          })
+        });
+      } else {
+        // Caso haja algum campo vazio ele ira retornar erro
+        alert("Todos os campos devem ser preenchidos!");
+      }
+    }
+
+    function updateProf() {
+      var cod = $('#update-cod').val();
+      var nome = $('#update-name').val();
+      var cpf = $('#update-cpf').val();
+      var date = $('#update-date').val();
+      var id = $('#id-selector').val();
+
+      if (cod && nome && cpf && date && id) {
+        // Caso todos os campos sejam preenchidos
+        $.ajax({
+          url: '../database/professores/update.php',
+          type: 'POST',
+          data: {
+            cod: cod,
+            nome: nome,
+            cpf: cpf,
+            date: date,
+            id: id,
+          },
+          success: function(result) {
+            // Retorno se tudo ocorreu normalmente
+            console.log(result)
+            alert("Professor " + nome + " alterado(a) com sucesso");
+            location.reload();
+          },
+          error: function(jqXHR, textStatus, errorThrown) {
+            // Retorno caso algum erro ocorra
+            alert("Erro: " + textStatus);
+          }
+        })
+
+      } else {
+        // Caso haja algum campo vazio ele ira retornar erro
+        alert("Todos os campos devem ser preenchidos!");
+      }
+    }
+  </script>
 </body>
 
 </html>
