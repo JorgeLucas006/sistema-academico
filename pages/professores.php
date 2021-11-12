@@ -48,11 +48,9 @@ include "../components/head.html";
     </div>
   </div>
 
-
   <div class="container ">
     <div class="row">
       <?php
-
       $list = require('../database/professores/list.php');
 
       foreach ($list as $key => $value) {
