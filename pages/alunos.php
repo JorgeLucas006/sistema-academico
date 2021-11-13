@@ -17,7 +17,7 @@ include "../components/head.html";
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Adicionar disciplina</h5>
+            <h5 class="modal-title" id="exampleModalLabel">Adicionar aluno</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -85,8 +85,8 @@ include "../components/head.html";
 
               <h5 class="card-title ">' . $value['nome'] . '</h5>
               <p class="card-text">' . $value['codigo'] . '</p>
-              <a href="#" class="btn btn-primary">Alterar</a>
-              <a href="#" class="btn btn-danger">Excluir</a>
+              <input type="button" class="btn btn-primary" onclick="alterModal(`' . $value['codigo'] . '`, `' . $value['nome'] . '`, `' . $value['cpf'] . '`, `' . $value['dt_nascimento'] . '`, `' . $value['id'] . '`)" value="Alterar" data-toggle="modal" data-target="#update-modal" data-whatever="@getbootstrap"></input>
+              <input type="button" class="btn btn-danger" onclick="deleteAluno(`' . $value['id'] . '`, `' . $value['nome'] . '`)" value="Excluir"></input>
             </div>
           </div>
         </div>';
@@ -94,6 +94,44 @@ include "../components/head.html";
       ?>
     </div>
   </div>
+
+  <div class="container-fluid text-center my-5">
+    <div class="modal fade" id="update-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Atualizando:</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form name="adiciona-disciplina" method="POST" action="">
+              <div class="form-group">
+                <label for="recipient-name" class="col-form-label">Código:</label>
+                <input type="text" class="form-control" name="cod" id="update-cod" required>
+              </div>
+              <div class="form-group">
+                <label for="message-text" class="col-form-label">Nome:</label>
+                <input type="text" class="form-control" name="name" id="update-name" required>
+              </div>
+              <div class="form-group">
+                <label for="message-text" class="col-form-label">CPF:</label>
+                <input type="number" class="form-control" name="cpf" id="update-cpf">
+              </div>
+              <div class="form-group">
+                <label for="message-text" class="col-form-label">Data de Nascimento:</label>
+                <input type="date" class="form-control" name="date" id="update-date">
+              </div>
+              <input type="hidden" id="id-selector" name="">
+              <input type="button" class="btn btn-primary" value="Enviar" onclick="updateAluno()"></input>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
   <script>
     function alterModal(cod, nome, cpf, date, id) {
@@ -105,16 +143,16 @@ include "../components/head.html";
       modal.find('#id-selector').val(id);
     }
 
-    function deleteProf(id, nome) {
+    function deleteAluno(id, nome) {
       $.ajax({
-        url: '../database/professores/delete.php',
+        url: '../database/alunos/delete.php',
         type: 'POST',
         data: {
           id: id
         },
         success: function(result) {
           // Retorno se tudo ocorreu normalmente
-          alert("Professor " + nome + " excluido(a) com sucesso");
+          alert("Aluno " + nome + " excluido(a) com sucesso");
           location.reload(); // then reload the page.(3)
         },
         error: function(jqXHR, textStatus, errorThrown) {
@@ -145,10 +183,8 @@ include "../components/head.html";
             },
             success: function(result) {
               // Retorno se tudo ocorreu normalmente
-              console.log(result);
-              /*
               alert("Aluno " + nome + " adicionado(a) com sucesso");
-              location.reload();*/
+              location.reload();
             },
             error: function(jqXHR, textStatus, errorThrown) {
               // Retorno caso algum erro ocorra
@@ -162,17 +198,16 @@ include "../components/head.html";
       }
     }
 
-    function updateProf() {
+    function updateAluno() {
       var cod = $('#update-cod').val();
       var nome = $('#update-name').val();
       var cpf = $('#update-cpf').val();
       var date = $('#update-date').val();
       var id = $('#id-selector').val();
-
       if (cod && nome && cpf && date && id) {
         // Caso todos os campos sejam preenchidos
         $.ajax({
-          url: '../database/professores/update.php',
+          url: '../database/alunos/update.php',
           type: 'POST',
           data: {
             cod: cod,
@@ -183,8 +218,7 @@ include "../components/head.html";
           },
           success: function(result) {
             // Retorno se tudo ocorreu normalmente
-            console.log(result)
-            alert("Professor " + nome + " alterado(a) com sucesso");
+            alert("Aluno " + nome + " alterado(a) com sucesso");
             location.reload();
           },
           error: function(jqXHR, textStatus, errorThrown) {
@@ -192,7 +226,6 @@ include "../components/head.html";
             alert("Erro: " + textStatus);
           }
         })
-
       } else {
         // Caso haja algum campo vazio ele ira retornar erro
         alert("Todos os campos devem ser preenchidos!");

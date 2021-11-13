@@ -56,7 +56,6 @@ include "../components/head.html";
     </div>
   </div>
 
-
   <div class="container ">
     <div class="row">
       <?php
@@ -74,15 +73,38 @@ include "../components/head.html";
               <h5 class="card-title ">' . $value['nome'] . '</h5>
               <p class="card-text">' . $value['codigo'] . '</p>
               <p class="card-text">Professor: ' . $value['p_nome'] . '</p>
-              <p class="card-text pb-2">Aluno: ' . $value['count'] . '</p>
-              <input type="button" class="btn btn-primary" onclick="alterModal(`'.$value['codigo'].'`, `'.$value['nome'].'`, `'.$value['p_id'].'`)" value="Alterar" data-toggle="modal" data-target="#update-modal" data-whatever="@getbootstrap"></input>
-              <input type="button" class="btn btn-danger" value="Excluir" onclick="deleteDisc(`'.$value['nome'].'`)"></input>
-            
+              <p class="card-text pb-2">Alunos: ' . $value['counts'] . '</p>
+              <input type="button" class="btn btn-primary" onclick="alterModal(`' . $value['codigo'] . '`, `' . $value['nome'] . '`, `' . $value['p_id'] . '`)" value="Alterar" data-toggle="modal" data-target="#update-modal" data-whatever="@getbootstrap"></input>
+              <input type="button" class="btn btn-danger" value="Excluir" onclick="deleteDisc(`' . $value['nome'] . '`)"></input>
+              <input type="button" class="btn btn-primary" value="Detalhes" onclick="listModal(`' . $value['nome'] . '`, `' . $value['codigo'] . '`, `' . $value['p_nome'] . '`)" data-toggle="modal" data-target="#list-modal" data-whatever="@getbootstrap"></input>
             </div>
           </div>
         </div>';
       };
       ?>
+    </div>
+  </div>
+
+  <div class="container-fluid text-center my-5">
+    <div class="modal fade" id="list-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Detalhes:</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <h5 class="card-title" id="list-name"></h5>
+            <p class="card-text" id="list-cod"></p>
+            <p class="card-text" id="list-teacher"></p>
+            <h5 class="card-text">Alunos:</h5>
+            <ul class="list-group" id="list-alunos">
+            </ul>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -130,6 +152,32 @@ include "../components/head.html";
   </div>
 
   <script>
+    function listModal(nome, cod, teacher) {
+      var modal = $('#list-modal');
+      modal.find('#list-cod').text("Codigo: " + cod);
+      modal.find('#list-name').text("Nome: " + nome);
+      modal.find('#list-teacher').text("Professor: " + teacher);
+      $("li").remove(".list-group-item");
+
+      $.ajax({
+        url: '../database/disciplinas/list-alunos.php',
+        type: 'POST',
+        data: {
+          nome: nome,
+        },
+        success: function(result) {
+          // Retorno se tudo ocorreu normalmente
+          result.map(item=>{
+            modal.find('#list-alunos').append("<li class='list-group-item'>"+item+"</li>");
+          })
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+          // Retorno caso algum erro ocorra
+        },
+        dataType: "json"
+      })
+    }
+
     function alterModal(cod, nome, teacher) {
       var modal = $('#update-modal');
       modal.find('#update-cod').val(cod);
